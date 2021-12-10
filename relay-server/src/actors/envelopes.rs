@@ -558,10 +558,12 @@ impl EnvelopeProcessor {
         };
 
         relay_log::trace!(
-            "Session dates: started:{}  timestamp:{}  received:{}",
+            "Session dates: started:{}  timestamp:{}  received:{} max_sess_in_past:{} max_future:{}",
             session.started,
             session.timestamp,
             received,
+            self.config.max_session_secs_in_past(),
+            self.config.max_secs_in_future(),
         );
 
         if session.sequence == u64::MAX {

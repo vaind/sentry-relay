@@ -557,6 +557,13 @@ impl EnvelopeProcessor {
             }
         };
 
+        relay_log::trace!(
+            "Session dates: started:{}  timestamp:{}  received:{}",
+            session.started,
+            session.timestamp,
+            received,
+        );
+
         if session.sequence == u64::MAX {
             relay_log::trace!("skipping session due to sequence overflow");
             return false;

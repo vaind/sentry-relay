@@ -86,6 +86,7 @@ pub fn extract_transaction_metrics(
     breakdowns_config: Option<&BreakdownsConfig>,
     event: &Event,
     target: &mut Vec<Metric>,
+    sampled: bool,
 ) -> bool {
     use relay_metrics::DurationPrecision;
 
@@ -139,6 +140,11 @@ pub fn extract_transaction_metrics(
     }
     if let Some(http_method) = extract_transaction_http_method(event) {
         tags.insert("http_method".to_owned(), http_method.to_owned());
+    }
+    if sampled {
+        tags.insert("dynamic_sampled".to_owned(), "true".to_owned());
+    } else {
+        tags.insert("dynamic_sampled".to_owned(), "false".to_owned());
     }
 
     if !config.extract_custom_tags.is_empty() {

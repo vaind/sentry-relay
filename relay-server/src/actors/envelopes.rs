@@ -1576,6 +1576,7 @@ impl EnvelopeProcessor {
     fn extract_transaction_metrics(
         &self,
         state: &mut ProcessEnvelopeState,
+        sampled: bool,
     ) -> Result<(), ProcessingError> {
         let config = match state.project_state.config.transaction_metrics {
             Some(ErrorBoundary::Ok(ref config)) => config,
@@ -1597,6 +1598,7 @@ impl EnvelopeProcessor {
                         breakdowns_config,
                         event,
                         &mut state.extracted_metrics,
+                        sampled
                     );
                 }
             );
@@ -1758,11 +1760,15 @@ impl EnvelopeProcessor {
 
             self.finalize_event(state)?;
 
+            let sampled = self.sample_event(state);
+
             if_processing!({
-                self.extract_transaction_metrics(state)?;
+                match sampled {
+                    Ok(v) => self.extract_transaction_metrics(state, true)?,
+                    Err(e) => self.extract_transaction_metrics(state, false)?,
+                }
             });
 
-            self.sample_event(state)?;
 
             if_processing!({
                 self.store_process_event(state)?;

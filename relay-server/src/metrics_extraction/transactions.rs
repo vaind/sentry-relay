@@ -50,6 +50,23 @@ fn extract_transaction_status(transaction: &Event) -> Option<String> {
     Some(span_status.to_string())
 }
 
+
+#[cfg(feature = "processing")]
+fn extract_transaction_op(transaction: &Event) -> Option<String> {
+    use relay_general::{
+        protocol::{Context, ContextInner},
+        types::Annotated,
+    };
+
+    let contexts = transaction.contexts.value()?;
+    let trace_context = match contexts.get("trace").map(Annotated::value) {
+        Some(Some(ContextInner(Context::Trace(trace_context)))) => trace_context,
+        _ => return None,
+    };
+    let span_status = trace_context.op.value()?;
+    Some(span_status.to_string())
+}
+
 #[cfg(feature = "processing")]
 fn extract_dist(transaction: &Event) -> Option<String> {
     let mut dist = transaction.dist.0.clone();
@@ -110,6 +127,9 @@ pub fn extract_transaction_metrics(
     }
     if let Some(transaction) = event.transaction.as_str() {
         tags.insert("transaction".to_owned(), transaction.to_owned());
+    }
+    if let Some(operation) = extract_transaction_op(event) {
+        tags.insert("transaction.op".to_owned(), operation.to_owned());
     }
 
     if !config.extract_custom_tags.is_empty() {

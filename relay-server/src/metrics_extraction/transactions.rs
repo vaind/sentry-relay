@@ -50,7 +50,6 @@ fn extract_transaction_status(transaction: &Event) -> Option<String> {
     Some(span_status.to_string())
 }
 
-
 #[cfg(feature = "processing")]
 fn extract_transaction_op(transaction: &Event) -> Option<String> {
     use relay_general::{
@@ -64,6 +63,13 @@ fn extract_transaction_op(transaction: &Event) -> Option<String> {
         _ => return None,
     };
     let span_status = trace_context.op.value()?;
+    Some(span_status.to_string())
+}
+
+#[cfg(feature = "processing")]
+fn extract_transaction_http_method(transaction: &Event) -> Option<String> {
+    let request = transaction.request.value()?;
+    let span_status = request.method.value()?;
     Some(span_status.to_string())
 }
 
@@ -130,6 +136,9 @@ pub fn extract_transaction_metrics(
     }
     if let Some(operation) = extract_transaction_op(event) {
         tags.insert("transaction.op".to_owned(), operation.to_owned());
+    }
+    if let Some(http_method) = extract_transaction_http_method(event) {
+        tags.insert("http_method".to_owned(), http_method.to_owned());
     }
 
     if !config.extract_custom_tags.is_empty() {
@@ -203,6 +212,33 @@ pub fn extract_transaction_metrics(
         }
         _ => 0,
     };
+
+    let OUTLIER_THRESHOLD = 900000_i64; // 15min
+    if duration_millis > OUTLIER_THRESHOLD {
+        tags.insert("is_duration_outlier".to_owned(), "true".to_owned());
+    } else {
+        tags.insert("is_duration_outlier".to_owned(), "false".to_owned());
+    }
+
+
+    let MISERY_THRESHOLD = 1200_i64; // This value will have to be pulled into Relay from thresholds, perhaps via project options.
+    if duration_millis > MISERY_THRESHOLD {
+        tags.insert("is_user_miserable".to_owned(), "true".to_owned());
+    } else {
+        tags.insert("is_user_miserable".to_owned(), "false".to_owned());
+    }
+
+    let APDEX_THRESHOLD = 300_i64; // This value will have to be pulled into Relay from thresholds, perhaps via project options.
+    if duration_millis <= APDEX_THRESHOLD {
+        tags.insert("is_satisfied".to_owned(), "true".to_owned());
+    } else {
+        tags.insert("is_satisfied".to_owned(), "false".to_owned());
+        if duration_millis <= APDEX_THRESHOLD * 4 {
+            tags.insert("is_tolerated".to_owned(), "true".to_owned());
+        } else {
+            tags.insert("is_tolerated".to_owned(), "false".to_owned());
+        }
+    }
 
     // We always push the duration even if it's 0, because we use count(transaction.duration)
     // to get the total number of transactions.

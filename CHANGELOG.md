@@ -2,18 +2,35 @@
 
 ## Unreleased
 
-**Internal**
+**Internal**:
+
+- Spread out metric aggregation over the aggregation window to avoid concentrated waves of metrics requests to the upstream every 10 seconds. Relay now applies jitter to `initial_delay` to spread out requests more evenly over time. ([#1185](https://github.com/getsentry/relay/pull/1185))
+
+## 22.2.0
+
+**Features**:
+
+- Add the `relay.override_project_ids` configuration flag to support migrating projects from self-hosted to Sentry SaaS. ([#1175](https://github.com/getsentry/relay/pull/1175))
+
+**Internal**:
 
 - Add an option to dispatch billing outcomes to a dedicated topic. ([#1168](https://github.com/getsentry/relay/pull/1168))
 - Add new `ItemType` to handle profiling data. ([#1170](https://github.com/getsentry/relay/pull/1170))
 
+**Bug Fixes**:
+
+- Fix regression in CSP report parsing. ([#1174](https://github.com/getsentry/relay/pull/1174))
+- Ignore replacement_chunks when they aren't used. ([#1180](https://github.com/getsentry/relay/pull/1180))
+
 ## 22.1.0
 
-**Features**
+**Features**:
+
 - Flush metrics and outcome aggregators on graceful shutdown. ([#1159](https://github.com/getsentry/relay/pull/1159))
 - Extract metrics from sampled transactions. ([#1161](https://github.com/getsentry/relay/pull/1161))
 
-**Internal**
+**Internal**:
+
 - Extract normalized dist as metric. ([#1158](https://github.com/getsentry/relay/pull/1158))
 - Extract transaction user as metric. ([#1164](https://github.com/getsentry/relay/pull/1164))
 

@@ -499,6 +499,11 @@ pub enum BucketValue {
     Gauge(GaugeValue),
 }
 
+#[test]
+fn test_sizeof() {
+    panic!("size = {}", std::mem::size_of::<BucketValue>());
+}
+
 impl BucketValue {
     /// Returns the type of this value.
     pub fn ty(&self) -> MetricType {
@@ -1025,7 +1030,7 @@ enum AggregatorState {
 /// ```
 pub struct Aggregator {
     config: AggregatorConfig,
-    buckets: HashMap<BucketKey, QueuedBucket>,
+    buckets: HashMap<BucketKey, QueuedBucket, fxhash::FxBuildHasher>,
     receiver: Recipient<FlushBuckets>,
     state: AggregatorState,
 }
@@ -1038,7 +1043,7 @@ impl Aggregator {
     pub fn new(config: AggregatorConfig, receiver: Recipient<FlushBuckets>) -> Self {
         Self {
             config,
-            buckets: HashMap::new(),
+            buckets: HashMap::default(),
             receiver,
             state: AggregatorState::Running,
         }

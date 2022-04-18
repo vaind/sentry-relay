@@ -218,7 +218,12 @@ fn consume_item(
         let file_name = content_disposition.as_ref().and_then(|d| d.get_filename());
 
         if let Some(file_name) = file_name {
-            let mut item = Item::new(ItemType::Attachment);
+            let item_type = match file_name {
+                "replay_rrweb" => ItemType::ReplayRrWeb,
+                _ => ItemType::Attachment,
+            };
+            let mut item = Item::new(item_type);
+
             item.set_attachment_type((*content.infer_type)(field_name));
             item.set_payload(content_type.into(), data);
             item.set_filename(file_name);

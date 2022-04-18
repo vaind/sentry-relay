@@ -59,6 +59,7 @@ struct Producers {
     sessions: Producer,
     metrics: Producer,
     profiles: Producer,
+    replayrrwebs: Producer,
 }
 
 impl Producers {
@@ -76,6 +77,7 @@ impl Producers {
             KafkaTopic::Sessions => Some(&self.sessions),
             KafkaTopic::Metrics => Some(&self.metrics),
             KafkaTopic::Profiles => Some(&self.profiles),
+            KafkaTopic::ReplayRrWebs => Some(&self.replayrrwebs),
         }
     }
 }
@@ -133,6 +135,7 @@ impl StoreForwarder {
             sessions: make_producer(&*config, &mut reused_producers, KafkaTopic::Sessions)?,
             metrics: make_producer(&*config, &mut reused_producers, KafkaTopic::Metrics)?,
             profiles: make_producer(&*config, &mut reused_producers, KafkaTopic::Profiles)?,
+            replayrrwebs: make_producer(&*config, &mut reused_producers, KafkaTopic::ReplayRrWebs)?,
         };
 
         Ok(Self { config, producers })
@@ -164,6 +167,7 @@ impl StoreForwarder {
         event_id: EventId,
         project_id: ProjectId,
         item: &Item,
+        topic: KafkaTopic,
     ) -> Result<ChunkedAttachment, StoreError> {
         let id = Uuid::new_v4().to_string();
 
@@ -186,7 +190,7 @@ impl StoreForwarder {
                 chunk_index,
             });
 
-            self.produce(KafkaTopic::Attachments, attachment_message)?;
+            self.produce(topic, attachment_message)?;
             offset += chunk_size;
             chunk_index += 1;
         }
@@ -623,6 +627,7 @@ enum KafkaMessage {
     Session(SessionKafkaMessage),
     Metric(MetricKafkaMessage),
     Profile(ProfileKafkaMessage),
+    ReplayRrWeb(AttachmentKafkaMessage),
 }
 
 impl KafkaMessage {
@@ -635,6 +640,7 @@ impl KafkaMessage {
             KafkaMessage::Session(_) => "session",
             KafkaMessage::Metric(_) => "metric",
             KafkaMessage::Profile(_) => "profile",
+            KafkaMessage::ReplayRrWeb(_) => "replay_rrweb",
         }
     }
 
@@ -648,6 +654,7 @@ impl KafkaMessage {
             Self::Session(_message) => Uuid::nil(), // Explicit random partitioning for sessions
             Self::Metric(_message) => Uuid::nil(),  // TODO(ja): Determine a partitioning key
             Self::Profile(_message) => Uuid::nil(),
+            Self::ReplayRrWeb(_message) => Uuid::nil(),
         };
 
         if uuid.is_nil() {
@@ -719,6 +726,7 @@ impl Handler<StoreEnvelope> for StoreForwarder {
         };
 
         let mut attachments = Vec::new();
+        let mut replay_rrwebs = Vec::new();
 
         for item in envelope.items() {
             match item.ty() {
@@ -728,8 +736,18 @@ impl Handler<StoreEnvelope> for StoreForwarder {
                         event_id.ok_or(StoreError::NoEventId)?,
                         scoping.project_id,
                         item,
+                        topic,
                     )?;
                     attachments.push(attachment);
+                }
+                ItemType::ReplayRrWeb => {
+                    let replay_rrweb = self.produce_attachment_chunks(
+                        event_id.ok_or(StoreError::NoEventId)?,
+                        scoping.project_id,
+                        item,
+                        KafkaTopic::ReplayRrWebs,
+                    )?;
+                    replay_rrwebs.push(replay_rrweb);
                 }
                 ItemType::UserReport => {
                     debug_assert!(topic == KafkaTopic::Attachments);
@@ -792,6 +810,21 @@ impl Handler<StoreEnvelope> for StoreForwarder {
                 });
 
                 self.produce(topic, attachment_message)?;
+                metric!(
+                    counter(RelayCounters::ProcessingMessageProduced) += 1,
+                    event_type = "attachment"
+                );
+            }
+        } else if !replay_rrwebs.is_empty() {
+            relay_log::trace!("Sending individual rrwebs of envelope to kafka");
+            for attachment in replay_rrwebs {
+                let replay_rrweb_message = KafkaMessage::ReplayRrWeb(AttachmentKafkaMessage {
+                    event_id: event_id.ok_or(StoreError::NoEventId)?,
+                    project_id: scoping.project_id,
+                    attachment,
+                });
+
+                self.produce(KafkaTopic::ReplayRrWebs, replay_rrweb_message)?;
                 metric!(
                     counter(RelayCounters::ProcessingMessageProduced) += 1,
                     event_type = "attachment"

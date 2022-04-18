@@ -131,7 +131,7 @@ setup-venv: .venv/bin/python
 .PHONY: setup-venv
 
 devserver:
-	@systemfd --no-pid -s http::3000 -- cargo watch -x "run -- run"
+	@systemfd --no-pid -s http::3001 -- cargo watch -x "run --all-features -- run"
 .PHONY: devserver
 
 clean-target-dir:

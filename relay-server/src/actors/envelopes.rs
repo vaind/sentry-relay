@@ -1303,6 +1303,7 @@ impl EnvelopeProcessor {
         // `process_event`.
         let event_item = envelope.take_item_by(|item| item.ty() == ItemType::Event);
         let transaction_item = envelope.take_item_by(|item| item.ty() == ItemType::Transaction);
+        let replay_item = envelope.take_item_by(|item| item.ty() == ItemType::ReplayEvent);
         let security_item = envelope.take_item_by(|item| item.ty() == ItemType::Security);
         let raw_security_item = envelope.take_item_by(|item| item.ty() == ItemType::RawSecurity);
         let form_item = envelope.take_item_by(|item| item.ty() == ItemType::FormData);
@@ -1333,6 +1334,14 @@ impl EnvelopeProcessor {
                 // Transaction items can only contain transaction events. Force the event type to
                 // hint to normalization that we're dealing with a transaction now.
                 self.event_from_json_payload(item, Some(EventType::Transaction))?
+            })
+        } else if let Some(mut item) = replay_item {
+            relay_log::trace!("processing json replay event");
+            state.sample_rates = item.take_sample_rates();
+            metric!(timer(RelayTimers::EventProcessingDeserialize), {
+                // Transaction items can only contain transaction events. Force the event type to
+                // hint to normalization that we're dealing with a transaction now.
+                self.event_from_json_payload(item, Some(EventType::ReplayEvent))?
             })
         } else if let Some(mut item) = raw_security_item {
             relay_log::trace!("processing security report");
@@ -1797,33 +1806,38 @@ impl EnvelopeProcessor {
 
             self.extract_event(state)?;
 
+            println!("1 {:?}", state.event);
+
             if_processing!({
                 self.process_unreal(state)?;
                 self.create_placeholders(state);
             });
-
+            println!("2 {:?}", state.event);
             self.finalize_event(state)?;
-
+            println!("3 {:?}", state.event);
             if_processing!({
                 self.extract_transaction_metrics(state)?;
             });
-
+            println!("4 {:?}", state.event);
             self.sample_event(state)?;
-
+            println!("5 {:?}", state.event);
             if_processing!({
                 self.store_process_event(state)?;
                 self.filter_event(state)?;
             });
+            println!("6 {:?}", state.event);
         }
 
         if_processing!({
             self.enforce_quotas(state)?;
         });
+        println!("7 {:?}", state.event);
 
         if state.has_event() {
             self.scrub_event(state)?;
             self.serialize_event(state)?;
         }
+        println!("8 {:?}", state.event);
 
         self.scrub_attachments(state);
 

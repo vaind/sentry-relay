@@ -36,6 +36,8 @@ pub enum EventType {
     ExpectStaple,
     /// Performance monitoring transactions carrying spans.
     Transaction,
+    /// Replay Events for session replays
+    ReplayEvent,
     /// All events that do not qualify as any other type.
     #[serde(other)]
     Default,
@@ -86,6 +88,7 @@ impl fmt::Display for EventType {
             EventType::ExpectCt => write!(f, "expectct"),
             EventType::ExpectStaple => write!(f, "expectstaple"),
             EventType::Transaction => write!(f, "transaction"),
+            EventType::ReplayEvent => write!(f, "replayevent"),
         }
     }
 }
@@ -110,6 +113,8 @@ pub enum DataCategory {
     /// Reserved data category that shall not appear in the outcomes.
     Internal = -2,
     /// Any other data category not known by this Relay.
+    /// Replay Events
+    ReplayEvent = 20,
     #[serde(other)]
     Unknown = -1,
 }
@@ -125,6 +130,7 @@ impl DataCategory {
             "attachment" => Self::Attachment,
             "session" => Self::Session,
             "internal" => Self::Internal,
+            "replayevent" => Self::ReplayEvent,
             _ => Self::Unknown,
         }
     }
@@ -139,6 +145,7 @@ impl DataCategory {
             Self::Attachment => "attachment",
             Self::Session => "session",
             Self::Internal => "internal",
+            Self::ReplayEvent => "replayevent",
             Self::Unknown => "unknown",
         }
     }
@@ -175,6 +182,7 @@ impl From<EventType> for DataCategory {
         match ty {
             EventType::Default | EventType::Error => Self::Error,
             EventType::Transaction => Self::Transaction,
+            EventType::ReplayEvent => Self::ReplayEvent,
             EventType::Csp | EventType::Hpkp | EventType::ExpectCt | EventType::ExpectStaple => {
                 Self::Security
             }

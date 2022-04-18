@@ -260,6 +260,9 @@ impl<'a> NormalizeProcessor<'a> {
         if event.ty.value() == Some(&EventType::Transaction) {
             return EventType::Transaction;
         }
+        if event.ty.value() == Some(&EventType::ReplayEvent) {
+            return EventType::ReplayEvent;
+        }
 
         // The SDKs do not describe event types, and we must infer them from available attributes.
         let has_exceptions = event

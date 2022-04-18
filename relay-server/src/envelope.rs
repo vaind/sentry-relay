@@ -116,6 +116,7 @@ impl ItemType {
         match event_type {
             EventType::Default | EventType::Error => ItemType::Event,
             EventType::Transaction => ItemType::Transaction,
+            EventType::ReplayEvent => ItemType::ReplayEvent,
             EventType::Csp | EventType::Hpkp | EventType::ExpectCt | EventType::ExpectStaple => {
                 ItemType::Security
             }
@@ -560,6 +561,7 @@ impl Item {
             | ItemType::Transaction
             | ItemType::Security
             | ItemType::RawSecurity
+            | ItemType::ReplayEvent
             | ItemType::UnrealReport => true,
 
             // Attachments are only event items if they are crash reports or if they carry partial
@@ -586,7 +588,6 @@ impl Item {
             | ItemType::Metrics
             | ItemType::MetricBuckets
             | ItemType::ClientReport
-            | ItemType::ReplayEvent
             | ItemType::ReplayRrWeb
             | ItemType::Profile => false,
         }

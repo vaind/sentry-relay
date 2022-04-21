@@ -104,7 +104,7 @@ fn infer_event_category(item: &Item) -> Option<DataCategory> {
         ItemType::FormData => None,
         ItemType::UserReport => None,
         ItemType::Profile => None,
-        ItemType::ReplayRrWeb => None,
+        ItemType::ReplayRecording => None,
         ItemType::ReplayEvent => None,
         // the following items are "internal" item types.  From the perspective of the SDK
         // the use the "internal" data category however this data category is in fact never

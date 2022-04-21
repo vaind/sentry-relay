@@ -1282,7 +1282,7 @@ impl EnvelopeProcessor {
             ItemType::MetricBuckets => false,
             ItemType::ClientReport => false,
             ItemType::Profile => false,
-            ItemType::ReplayRrWeb => false,
+            ItemType::ReplayRecording => false,
             ItemType::ReplayEvent => false,
         }
     }
@@ -1806,38 +1806,29 @@ impl EnvelopeProcessor {
 
             self.extract_event(state)?;
 
-            println!("1 {:?}", state.event);
-
             if_processing!({
                 self.process_unreal(state)?;
                 self.create_placeholders(state);
             });
-            println!("2 {:?}", state.event);
             self.finalize_event(state)?;
-            println!("3 {:?}", state.event);
             if_processing!({
                 self.extract_transaction_metrics(state)?;
             });
-            println!("4 {:?}", state.event);
             self.sample_event(state)?;
-            println!("5 {:?}", state.event);
             if_processing!({
                 self.store_process_event(state)?;
                 self.filter_event(state)?;
             });
-            println!("6 {:?}", state.event);
         }
 
         if_processing!({
             self.enforce_quotas(state)?;
         });
-        println!("7 {:?}", state.event);
 
         if state.has_event() {
             self.scrub_event(state)?;
             self.serialize_event(state)?;
         }
-        println!("8 {:?}", state.event);
 
         self.scrub_attachments(state);
 

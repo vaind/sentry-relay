@@ -88,7 +88,7 @@ impl fmt::Display for EventType {
             EventType::ExpectCt => write!(f, "expectct"),
             EventType::ExpectStaple => write!(f, "expectstaple"),
             EventType::Transaction => write!(f, "transaction"),
-            EventType::ReplayEvent => write!(f, "replayevent"),
+            EventType::ReplayEvent => write!(f, "replay_event"),
         }
     }
 }
@@ -130,7 +130,7 @@ impl DataCategory {
             "attachment" => Self::Attachment,
             "session" => Self::Session,
             "internal" => Self::Internal,
-            "replayevent" => Self::ReplayEvent,
+            "replay_event" => Self::ReplayEvent,
             _ => Self::Unknown,
         }
     }
@@ -145,7 +145,7 @@ impl DataCategory {
             Self::Attachment => "attachment",
             Self::Session => "session",
             Self::Internal => "internal",
-            Self::ReplayEvent => "replayevent",
+            Self::ReplayEvent => "replay_event",
             Self::Unknown => "unknown",
         }
     }

@@ -98,7 +98,6 @@ impl<'a> Processor for StoreProcessor<'a> {
 
         // Convert legacy data structures to current format
         legacy::LegacyProcessor.process_event(event, meta, state)?;
-        println!("Here?");
         if !is_renormalize {
             // internally noops for non-transaction events
             // TODO: Parts of this processor should probably be a filter once Relay is store so we

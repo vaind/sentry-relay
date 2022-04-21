@@ -219,7 +219,7 @@ fn consume_item(
 
         if let Some(file_name) = file_name {
             let item_type = match file_name {
-                "replay_rrweb" => ItemType::ReplayRrWeb,
+                "replay_recording" => ItemType::ReplayRecording,
                 _ => ItemType::Attachment,
             };
             let mut item = Item::new(item_type);

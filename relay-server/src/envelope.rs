@@ -104,8 +104,8 @@ pub enum ItemType {
     ClientReport,
     /// Profile event payload encoded in JSON
     Profile,
-    /// Replay RRWeb payload
-    ReplayRrWeb,
+    /// Replay Recording payload
+    ReplayRecording,
     /// Replay metadata and breadcrumb payload
     ReplayEvent,
 }
@@ -141,7 +141,7 @@ impl fmt::Display for ItemType {
             Self::MetricBuckets => write!(f, "metric buckets"),
             Self::ClientReport => write!(f, "client report"),
             Self::Profile => write!(f, "profile"),
-            Self::ReplayRrWeb => write!(f, "replay_rrweb"),
+            Self::ReplayRecording => write!(f, "replay_recording"),
             Self::ReplayEvent => write!(f, "replay_event"),
         }
     }
@@ -588,7 +588,7 @@ impl Item {
             | ItemType::Metrics
             | ItemType::MetricBuckets
             | ItemType::ClientReport
-            | ItemType::ReplayRrWeb
+            | ItemType::ReplayRecording
             | ItemType::Profile => false,
         }
     }
@@ -612,7 +612,7 @@ impl Item {
             ItemType::MetricBuckets => false,
             ItemType::ClientReport => false,
             ItemType::Profile => false,
-            ItemType::ReplayRrWeb => false,
+            ItemType::ReplayRecording => false,
             ItemType::ReplayEvent => false,
         }
     }

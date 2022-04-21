@@ -767,8 +767,8 @@ pub enum KafkaTopic {
     Metrics,
     /// Profiles
     Profiles,
-    /// ReplayRrWebs
-    ReplayRrWebs,
+    /// ReplayRecordings
+    ReplayRecordings,
     ///
     ReplayEvents,
 }
@@ -794,8 +794,8 @@ pub struct TopicAssignments {
     /// Stacktrace topic name
     pub profiles: TopicAssignment,
     /// Stacktrace topic name
-    pub replayrrwebs: TopicAssignment,
-    pub replayevents: TopicAssignment,
+    pub replay_recordings: TopicAssignment,
+    pub replay_events: TopicAssignment,
 }
 
 impl TopicAssignments {
@@ -810,8 +810,8 @@ impl TopicAssignments {
             KafkaTopic::Sessions => &self.sessions,
             KafkaTopic::Metrics => &self.metrics,
             KafkaTopic::Profiles => &self.profiles,
-            KafkaTopic::ReplayRrWebs => &self.replayrrwebs,
-            KafkaTopic::ReplayEvents => &self.replayevents,
+            KafkaTopic::ReplayRecordings => &self.replay_recordings,
+            KafkaTopic::ReplayEvents => &self.replay_events,
         }
     }
 }
@@ -827,8 +827,8 @@ impl Default for TopicAssignments {
             sessions: "ingest-sessions".to_owned().into(),
             metrics: "ingest-metrics".to_owned().into(),
             profiles: "profiles".to_owned().into(),
-            replayrrwebs: "ingest-replay_rrwebs".to_owned().into(),
-            replayevents: "ingest-replay_events".to_owned().into(),
+            replay_recordings: "ingest-replay-recordings".to_owned().into(),
+            replay_events: "ingest-replay-events".to_owned().into(),
         }
     }
 }

@@ -1810,11 +1810,15 @@ impl EnvelopeProcessor {
                 self.process_unreal(state)?;
                 self.create_placeholders(state);
             });
+
             self.finalize_event(state)?;
+
             if_processing!({
                 self.extract_transaction_metrics(state)?;
             });
+
             self.sample_event(state)?;
+
             if_processing!({
                 self.store_process_event(state)?;
                 self.filter_event(state)?;

@@ -767,9 +767,9 @@ pub enum KafkaTopic {
     Metrics,
     /// Profiles
     Profiles,
-    /// ReplayRecordings
+    /// ReplayRecordings, large blobs
     ReplayRecordings,
-    ///
+    /// ReplayEvents, breadcrumb + session updates for replays
     ReplayEvents,
 }
 
@@ -793,8 +793,9 @@ pub struct TopicAssignments {
     pub metrics: TopicAssignment,
     /// Stacktrace topic name
     pub profiles: TopicAssignment,
-    /// Stacktrace topic name
+    /// Recordings topic name.
     pub replay_recordings: TopicAssignment,
+    /// Replay Events topic name.
     pub replay_events: TopicAssignment,
 }
 

@@ -561,7 +561,6 @@ struct EventKafkaMessage {
     attachments: Vec<ChunkedAttachment>,
 }
 #[derive(Clone, Debug, Serialize)]
-
 struct ReplayEventKafkaMessage {
     /// Raw event payload.
     payload: Bytes,

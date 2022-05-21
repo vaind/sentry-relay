@@ -253,6 +253,7 @@
 )]
 
 mod actors;
+mod alloc;
 mod body;
 mod constants;
 mod endpoints;

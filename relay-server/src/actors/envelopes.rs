@@ -48,6 +48,7 @@ use crate::actors::project_cache::{
     UpdateRateLimits,
 };
 use crate::actors::upstream::{SendRequest, UpstreamRelay, UpstreamRequest, UpstreamRequestError};
+use crate::alloc::{MemoryUseCase, ALLOCATOR};
 use crate::envelope::{self, AttachmentType, ContentType, Envelope, EnvelopeError, Item, ItemType};
 use crate::extractors::{PartialDsn, RequestMeta};
 use crate::http::{HttpError, Request, RequestBuilder, Response};
@@ -668,6 +669,7 @@ impl EnvelopeProcessor {
 
         // Extract metrics if they haven't been extracted by a prior Relay
         if metrics_config.is_enabled() && !item.metrics_extracted() {
+            let _usecase = ALLOCATOR.with_usecase(MemoryUseCase::SessionMetricsExtraction);
             extract_session_metrics(&session.attributes, &session, client, extracted_metrics);
             item.set_metrics_extracted(true);
         }

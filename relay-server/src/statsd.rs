@@ -456,6 +456,8 @@ pub enum RelayCounters {
     EvictingStaleProjectCaches,
     /// Number of times that parsing a metrics bucket item from an envelope failed.
     MetricBucketsParsingFailed,
+    /// Tracks memory allocated and deallocated
+    MemoryUsage,
 }
 
 impl CounterMetric for RelayCounters {
@@ -481,6 +483,7 @@ impl CounterMetric for RelayCounters {
             RelayCounters::ResponsesStatusCodes => "responses.status_codes",
             RelayCounters::EvictingStaleProjectCaches => "project_cache.eviction",
             RelayCounters::MetricBucketsParsingFailed => "metrics.buckets.parsing_failed",
+            RelayCounters::MemoryUsage => "memory.usage",
         }
     }
 }

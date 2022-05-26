@@ -3,12 +3,16 @@ use crate::CounterMetric;
 pub enum AllocCounters {
     /// Tracks memory allocated and deallocated
     Alloc,
+    DeallocGlitch,
+    Error,
 }
 
 impl CounterMetric for AllocCounters {
     fn name(&self) -> &'static str {
         match *self {
             AllocCounters::Alloc => "alloc",
+            AllocCounters::DeallocGlitch => "dealloc_glitch",
+            AllocCounters::Error => "error",
         }
     }
 }
@@ -43,6 +47,14 @@ memento::usecase! {
                 counter(AllocCounters::Alloc) -= size as i64,
                 use_case = self.as_str()
             );
+        }
+
+        fn on_dealloc_glitch() {
+            metric!(counter(AllocCounters::DeallocGlitch) += 1);
+        }
+
+        fn on_error() {
+            metric!(counter(AllocCounters::Error) += 1);
         }
     }
 }

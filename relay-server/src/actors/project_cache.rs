@@ -365,6 +365,7 @@ impl Handler<GetCachedProjectState> for ProjectCache {
         message: GetCachedProjectState,
         _context: &mut Context<Self>,
     ) -> Self::Result {
+        let _usecase = Allocator::with_usecase(RelayMemoryUseCase::ProjectState);
         let project = self.get_or_create_project(message.project_key);
         project.get_or_fetch_state(false);
         project.state_clone()

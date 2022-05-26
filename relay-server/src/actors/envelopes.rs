@@ -38,7 +38,7 @@ use relay_metrics::{Bucket, Metric};
 use relay_quotas::{DataCategory, RateLimits, ReasonCode, Scoping};
 use relay_redis::RedisPool;
 use relay_sampling::{RuleId, SamplingResult};
-use relay_statsd::metric;
+use relay_statsd::{metric, Allocator, RelayMemoryUseCase};
 
 use crate::actors::outcome::{DiscardReason, Outcome, TrackOutcome};
 use crate::actors::outcome_aggregator::OutcomeAggregator;
@@ -48,7 +48,6 @@ use crate::actors::project_cache::{
     UpdateRateLimits,
 };
 use crate::actors::upstream::{SendRequest, UpstreamRelay, UpstreamRequest, UpstreamRequestError};
-use crate::alloc::{MemoryUseCase, ALLOCATOR};
 use crate::envelope::{self, AttachmentType, ContentType, Envelope, EnvelopeError, Item, ItemType};
 use crate::extractors::{PartialDsn, RequestMeta};
 use crate::http::{HttpError, Request, RequestBuilder, Response};
@@ -669,7 +668,7 @@ impl EnvelopeProcessor {
 
         // Extract metrics if they haven't been extracted by a prior Relay
         if metrics_config.is_enabled() && !item.metrics_extracted() {
-            let _usecase = ALLOCATOR.with_usecase(MemoryUseCase::SessionMetricsExtraction);
+            let _usecase = Allocator::with_usecase(RelayMemoryUseCase::SessionMetricsExtraction);
             extract_session_metrics(&session.attributes, &session, client, extracted_metrics);
             item.set_metrics_extracted(true);
         }

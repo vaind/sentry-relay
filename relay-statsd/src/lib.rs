@@ -554,3 +554,6 @@ macro_rules! metric {
         rv
     }};
 }
+
+mod alloc;
+pub use crate::alloc::*;

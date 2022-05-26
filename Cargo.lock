@@ -3475,7 +3475,6 @@ dependencies = [
  "lazy_static",
  "libc",
  "listenfd",
- "memento",
  "minidump",
  "native-tls",
  "parking_lot 0.10.2",
@@ -3516,6 +3515,7 @@ version = "22.5.0"
 dependencies = [
  "cadence",
  "lazy_static",
+ "memento",
  "parking_lot 0.10.2",
  "rand 0.7.3",
  "relay-log",

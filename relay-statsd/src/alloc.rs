@@ -46,6 +46,7 @@ impl RelayMemoryUseCase {
             RelayMemoryUseCase::StoreNormalizer => "store_normalizer",
             RelayMemoryUseCase::MetricsAggregator => "metrics_aggregator",
             RelayMemoryUseCase::SessionMetricsExtraction => "session_metrics_extraction",
+            RelayMemoryUseCase::ProjectState => "project_state",
         }
     }
 }

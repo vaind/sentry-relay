@@ -24,6 +24,10 @@ memento::usecase! {
 
     impl memento::UseCase for RelayMemoryUseCase {
         fn on_alloc(&self, size: usize) {
+            if matches!(self, RelayMemoryUseCase::None) {
+                return;
+            }
+
             metric!(
                 counter(AllocCounters::Alloc) += size as i64,
                 use_case = self.as_str()
@@ -31,6 +35,10 @@ memento::usecase! {
         }
 
         fn on_dealloc(&self, size: usize) {
+            if matches!(self, RelayMemoryUseCase::None) {
+                return;
+            }
+
             metric!(
                 counter(AllocCounters::Alloc) -= size as i64,
                 use_case = self.as_str()

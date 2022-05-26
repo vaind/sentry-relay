@@ -54,7 +54,7 @@ memento::usecase! {
         }
 
         fn on_error() {
-            metric!(counter(AllocCounters::Error) += 1);
+            // metric!(counter(AllocCounters::Error) += 1);
         }
     }
 }

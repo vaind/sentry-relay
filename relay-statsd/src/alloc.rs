@@ -32,6 +32,8 @@ memento::usecase! {
                 return;
             }
 
+            let _usecase = Allocator::with_usecase(RelayMemoryUseCase::None);
+
             metric!(
                 counter(AllocCounters::Alloc) += size as i64,
                 use_case = self.as_str()
@@ -42,6 +44,7 @@ memento::usecase! {
             if matches!(self, RelayMemoryUseCase::None) {
                 return;
             }
+            let _usecase = Allocator::with_usecase(RelayMemoryUseCase::None);
 
             metric!(
                 counter(AllocCounters::Alloc) -= size as i64,
@@ -50,6 +53,7 @@ memento::usecase! {
         }
 
         fn on_dealloc_glitch() {
+            let _usecase = Allocator::with_usecase(RelayMemoryUseCase::None);
             metric!(counter(AllocCounters::DeallocGlitch) += 1);
         }
 

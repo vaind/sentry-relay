@@ -15,4 +15,4 @@ lazy_static = "1.4.0"
 parking_lot = "0.10.0"
 rand = "0.7.3"
 relay-log = { path = "../relay-log" }
-memento = { path = "/Users/untitaker/projects/memento" }
+memento = { git = "https://github.com/untitaker/memento" }

@@ -228,13 +228,15 @@ where
     F: FnOnce(&MetricsClient) -> R,
     R: Default,
 {
-    CURRENT_CLIENT.with(|client| {
-        if let Some(client) = client {
-            f(&*client)
-        } else {
-            R::default()
-        }
-    })
+    CURRENT_CLIENT
+        .try_with(|client| {
+            if let Some(client) = client {
+                f(&*client)
+            } else {
+                R::default()
+            }
+        })
+        .unwrap_or_default()
 }
 
 /// A metric for capturing timings.

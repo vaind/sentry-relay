@@ -19,6 +19,7 @@ memento::usecase! {
         StoreNormalizer,
         MetricsAggregator,
         SessionMetricsExtraction,
+        ProjectState,
     }
 
     impl memento::UseCase for RelayMemoryUseCase {

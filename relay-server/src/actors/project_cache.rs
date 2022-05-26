@@ -12,7 +12,7 @@ use relay_config::{Config, RelayMode};
 use relay_metrics::{self, AggregateMetricsError, Bucket, FlushBuckets, Metric};
 use relay_quotas::{RateLimits, Scoping};
 use relay_redis::RedisPool;
-use relay_statsd::metric;
+use relay_statsd::{metric, Allocator, RelayMemoryUseCase};
 
 use crate::actors::envelopes::{EnvelopeManager, SendMetrics};
 use crate::actors::outcome::DiscardReason;
@@ -73,6 +73,7 @@ impl ProjectCache {
     }
 
     fn evict_stale_project_caches(&mut self) {
+        let _usecase = Allocator::with_usecase(RelayMemoryUseCase::ProjectState);
         metric!(counter(RelayCounters::EvictingStaleProjectCaches) += 1);
         let eviction_start = Instant::now();
         let delta = 2 * self.config.project_cache_expiry() + self.config.project_grace_period();
@@ -84,6 +85,7 @@ impl ProjectCache {
     }
 
     fn get_or_create_project(&mut self, project_key: ProjectKey) -> &mut Project {
+        let _usecase = Allocator::with_usecase(RelayMemoryUseCase::ProjectState);
         metric!(histogram(RelayHistograms::ProjectStateCacheSize) = self.projects.len() as u64);
 
         let config = self.config.clone();

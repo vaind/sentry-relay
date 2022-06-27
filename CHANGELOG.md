@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+- Bump Native SDK to v0.4.18 ([#2](https://github.com/vaind/sentry-relay/pull/2))
+  - [changelog](https://github.com/getsentry/sentry-native/blob/master/CHANGELOG.md#0418)
+  - [diff](https://github.com/getsentry/sentry-native/compare/0.4.12...0.4.18)
+
 ## 22.6.0
 
 **Compatibility:** This version of Relay requires Sentry server `22.6.0` or newer.
